@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+set -e
+
+PROJECT="$1"
+
+if [[ -z "$PROJECT" ]]; then
+    echo "Project name must be given as an argument."
+    exit 1
+fi
+
+FILENAME="$PROJECT-*"
+REPORT="$(find target/debug -maxdepth 1 -name $FILENAME -a ! -name '*.d')"
+
+if [[ -z "$REPORT" ]]; then
+    echo "No report found. Was the project built yet?"
+    exit 1
+fi
+
+for file in $REPORT; do
+    mkdir -p "target/cov/$(basename $file)"
+    kcov --exclude-pattern=/.cargo,/usr/lib --verify "target/cov/$(basename $file)" "$file"
+done
+
+codecov -Z -t $CODECOV_TOKEN
+echo "Uploaded kcov coverage to codecov.io"

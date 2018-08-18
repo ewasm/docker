@@ -2,6 +2,8 @@
 
 Builds off the [official rust docker](https://hub.docker.com/_/rust/).
 
-Adds `rustfmt`, wasm32 support, `wasm-gc`, `just`, and `kcov`.
+Adds `rustfmt`, wasm32 support, `wasm-gc`, `just`, `kcov` and codecov.io.
 
 Available as [ewasm/rust-wasm](https://hub.docker.com/ewasm/rust-wasm/).
+
+Need to run with `--security-opt seccomp=unconfined` option to enable `kcov` support.

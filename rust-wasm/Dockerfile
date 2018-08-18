@@ -30,3 +30,10 @@ RUN cargo install just
 
 RUN apt-get -y install libdw1
 COPY --from=builder /usr/bin/kcov /usr/bin
+
+# Install codecov support
+RUN wget -O - -q "https://codecov.io/bash" > /usr/bin/codecov
+RUN chmod +x /usr/bin/codecov
+
+ADD rust-codecov /usr/bin/rust-codecov
+RUN chmod +x /usr/bin/rust-codecov
