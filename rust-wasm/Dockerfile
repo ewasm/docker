@@ -4,7 +4,7 @@
 FROM rust:1 as builder
 
 # Install dependencies
-RUN apt update -y && apt-get -y install binutils-dev wget cmake libelf-dev libdwarf-dev libdw-dev libiberty-dev
+RUN apt-get update -y && apt-get -y install binutils-dev wget cmake libelf-dev libdwarf-dev libdw-dev libiberty-dev
 
 # Build kcov
 RUN wget -O - https://github.com/SimonKagstrom/kcov/archive/v35.tar.gz | tar zxvf -
@@ -15,7 +15,7 @@ RUN make -j $(nproc) && make install
 # Create our derived image off the official rust one.
 FROM rust:1
 
-RUN apt update -y
+RUN apt-get update -y
 
 RUN rustup update
 
