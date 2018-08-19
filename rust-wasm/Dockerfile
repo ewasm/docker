@@ -37,3 +37,7 @@ RUN chmod +x /usr/bin/codecov
 
 ADD rust-codecov /usr/bin/rust-codecov
 RUN chmod +x /usr/bin/rust-codecov
+
+# Install tarpaulin
+RUN apt-get -y install libssl-dev pkg-config cmake zlib1g-dev
+RUN RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo install cargo-tarpaulin
