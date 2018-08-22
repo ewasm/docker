@@ -15,29 +15,27 @@ RUN make -j $(nproc) && make install
 # Create our derived image off the official rust one.
 FROM rust:1
 
-RUN apt-get update -y
+RUN apt update -qy \
+	&& apt-get install -y --no-install-recommends \
+		# For kcov:
+		libdw1 \
+		# For tarpaulin:
+		libssl-dev pkg-config cmake zlib1g-dev \
+	&& rm -rf /var/lib/apt/lists/*
 
-RUN rustup update
-
-RUN rustup install beta
-RUN rustup default stable
-
-RUN rustup target add wasm32-unknown-unknown
-RUN rustup component add rustfmt-preview
-
-RUN cargo install wasm-gc
-RUN cargo install just
-
-RUN apt-get -y install libdw1
-COPY --from=builder /usr/bin/kcov /usr/bin
+RUN rustup update \
+	&& rustup install beta \
+	&& rustup default stable \
+	&& rustup target add wasm32-unknown-unknown \
+	&& rustup component add rustfmt-preview
+RUN cargo install wasm-gc \
+	&& cargo install just \
+	&& RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo install cargo-tarpaulin \
+	&& rm -rf /usr/local/cargo/registry
 
 # Install codecov support
-RUN wget -O - -q "https://codecov.io/bash" > /usr/bin/codecov
-RUN chmod +x /usr/bin/codecov
-
+COPY --from=builder /usr/bin/kcov /usr/bin
 ADD rust-codecov /usr/bin/rust-codecov
-RUN chmod +x /usr/bin/rust-codecov
-
-# Install tarpaulin
-RUN apt-get -y install libssl-dev pkg-config cmake zlib1g-dev
-RUN RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo install cargo-tarpaulin
+RUN wget -O - -q "https://codecov.io/bash" > /usr/bin/codecov \
+	&& chmod +x /usr/bin/codecov \
+	&& chmod +x /usr/bin/rust-codecov
